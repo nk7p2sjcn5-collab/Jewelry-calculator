@@ -132,7 +132,6 @@
       color: var(--primary);
     }
 
-    /* Fixed Input Box Styling for Mobile */
     .calc-table input {
       width: 100%;
       min-width: 70px;
@@ -199,8 +198,8 @@
 
   <div class="meta-fields">
     <div class="field-group">
-      <label>Date (मिति)</label>
-      <input type="date" id="docDate">
+      <label>Nepali Date (मिति B.S.)</label>
+      <input type="text" id="docDate" placeholder="YYYY-MM-DD" value="2083-04-19">
     </div>
     <div class="field-group">
       <label>Item Name (सामान)</label>
@@ -301,8 +300,6 @@
 </div>
 
 <script>
-  document.getElementById('docDate').valueAsDate = new Date();
-
   function formatNum(num) {
     return num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
