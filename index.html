@@ -172,12 +172,17 @@
       border-radius: 6px;
       font-weight: 600;
       cursor: pointer;
+      flex: 1;
+    }
+
+    .btn-primary {
+      background: #16a34a;
+      color: white;
     }
 
     .btn-secondary {
       background: #e2e8f0;
       color: var(--text);
-      width: 100%;
     }
 
     @media print {
@@ -198,12 +203,20 @@
 
   <div class="meta-fields">
     <div class="field-group">
+      <label>Customer Name (ग्राहक नाम)</label>
+      <input type="text" id="customerName" placeholder="e.g. Abagya" value="ABAGYA">
+    </div>
+    <div class="field-group">
+      <label>Phone (फोन)</label>
+      <input type="tel" id="phone" placeholder="e.g. 9841263444" value="9841263444">
+    </div>
+    <div class="field-group">
       <label>Nepali Date (मिति B.S.)</label>
       <input type="text" id="docDate" placeholder="YYYY-MM-DD" value="2083-04-19">
     </div>
     <div class="field-group">
       <label>Item Name (सामान)</label>
-      <input type="text" id="itemName" placeholder="e.g. Silver Chain">
+      <input type="text" id="itemName" placeholder="e.g. Silver Chain" value="Silver Chain">
     </div>
   </div>
 
@@ -295,11 +308,15 @@
   </table>
 
   <div class="actions">
+    <button class="btn btn-primary" id="saveBtn" onclick="saveToSheets()">Save to Google Sheets</button>
     <button class="btn btn-secondary" onclick="window.print()">Print / Save PDF</button>
   </div>
 </div>
 
 <script>
+  // Paste your published Google Web App Deployment URL here:
+  const GOOGLE_SCRIPT_URL = "YOUR_WEB_APP_URL_HERE";
+
   function formatNum(num) {
     return num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
@@ -344,6 +361,54 @@
 
     const remainingAmt = grandTotal - advanceAmt;
     document.getElementById('remainingAmt').innerText = formatNum(remainingAmt);
+  }
+
+  function saveToSheets() {
+    if (GOOGLE_SCRIPT_URL === "YOUR_WEB_APP_URL_HERE") {
+      alert("Please deploy your Google Apps Script and paste the Web App URL in line 223 of the code.");
+      return;
+    }
+
+    const saveBtn = document.getElementById('saveBtn');
+    saveBtn.innerText = "Saving...";
+    saveBtn.disabled = true;
+
+    const payload = {
+      docDate: document.getElementById('docDate').value,
+      customerName: document.getElementById('customerName').value,
+      phone: document.getElementById('phone').value,
+      itemName: document.getElementById('itemName').value,
+      weight: document.getElementById('weight').value,
+      jartiPercent: document.getElementById('jartiPercent').value,
+      jartiWt: document.getElementById('jartiWt').innerText,
+      totalWtWithJarti: document.getElementById('totalWtWithJarti').innerText,
+      silverGiven: document.getElementById('silverGiven').value,
+      netWt: document.getElementById('netWt').innerText,
+      rate: document.getElementById('rate').value,
+      silverCost: document.getElementById('silverCost').innerText,
+      jyalaPerTola: document.getElementById('jyalaPerTola').value,
+      jyalaPerItem: document.getElementById('jyalaPerItem').value,
+      subTotal: document.getElementById('subTotal').innerText,
+      discount: document.getElementById('discount').value,
+      taxAmt: document.getElementById('taxAmt').innerText,
+      grandTotal: document.getElementById('grandTotal').innerText,
+      remainingAmt: document.getElementById('remainingAmt').innerText
+    };
+
+    fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    }).then(() => {
+      alert("Saved successfully to your Google Sheet!");
+      saveBtn.innerText = "Save to Google Sheets";
+      saveBtn.disabled = false;
+    }).catch(err => {
+      alert("Save failed: " + err);
+      saveBtn.innerText = "Save to Google Sheets";
+      saveBtn.disabled = false;
+    });
   }
 
   calculate();
