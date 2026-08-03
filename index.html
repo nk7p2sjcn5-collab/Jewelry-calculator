@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Billing Summary</title>
+    <title>Jewelry Billing Calculator</title>
     <style>
         * {
             box-sizing: border-box;
@@ -16,15 +16,15 @@
             background-color: #f5f5f7;
             display: flex;
             justify-content: center;
-            padding: 20px;
+            padding: 16px;
         }
 
         .billing-card {
             width: 100%;
             max-width: 480px;
             background: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
             padding: 16px;
         }
 
@@ -32,15 +32,15 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
+            padding: 8px 0;
             border-bottom: 1px solid #f0f0f0;
             font-size: 14px;
         }
 
         .row-highlight {
             background-color: #fffde7;
-            padding: 12px;
-            border-radius: 4px;
+            padding: 10px;
+            border-radius: 6px;
             border-bottom: none;
             margin: 6px 0;
         }
@@ -48,14 +48,14 @@
         .row-green {
             border-top: 2px solid #2e7d32;
             border-bottom: 2px solid #2e7d32;
-            padding: 12px 0;
+            padding: 10px 0;
             margin: 8px 0;
         }
 
         .row-red {
             background-color: #fdeded;
-            padding: 12px;
-            border-radius: 4px;
+            padding: 10px;
+            border-radius: 6px;
             border-bottom: none;
             margin: 8px 0;
         }
@@ -72,7 +72,7 @@
         }
 
         .input-box {
-            width: 140px;
+            width: 110px;
             padding: 6px 8px;
             border: 1px solid #cccccc;
             border-radius: 6px;
@@ -122,7 +122,7 @@
 
 <div class="billing-card">
 
-    <!-- CUSTOMER DETAILS SECTION -->
+    <!-- CUSTOMER DETAILS -->
     <div class="row">
         <span class="label">CUSTOMER NAME<span class="sub-label">(ग्राहकको नाम)</span></span>
         <input type="text" id="customerName" class="input-box input-full" list="customerList" placeholder="Type name..." oninput="updatePhoneNumber()">
@@ -134,43 +134,73 @@
         <input type="text" id="phoneNumber" class="input-box input-full" placeholder="Auto-filled phone" readonly>
     </div>
 
-    <!-- BILLING DETAILS SECTION -->
+    <!-- UPPER CALCULATION FIELDS -->
+    <div class="row">
+        <span class="label">WEIGHT (TOLA)<span class="sub-label">(तौला)</span></span>
+        <input type="number" id="weight" class="input-box" value="0.00">
+    </div>
+
+    <div class="row row-highlight">
+        <span class="label">GOLD RATE / TOTAL<span class="sub-label">(दर / जम्मा)</span></span>
+        <div>
+            <input type="number" id="rate" class="input-box" value="4350" style="margin-right: 8px;">
+            <span class="amount" id="goldTotal">3,38,256.00</span>
+        </div>
+    </div>
+
+    <div class="row">
+        <span class="label">JYALA / TOLA<span class="sub-label">(तौला ज्याला)</span></span>
+        <div>
+            <input type="number" id="jyalaTola" class="input-box" value="200" style="margin-right: 8px;">
+            <span class="amount" id="jyalaTolaTotal">14,400.00</span>
+        </div>
+    </div>
+
+    <div class="row">
+        <span class="label">JYALA / ITEM<span class="sub-label">(प्रति ज्याला)</span></span>
+        <div>
+            <input type="number" id="jyalaItem" class="input-box" value="0" style="margin-right: 8px;">
+            <span class="amount" id="jyalaItemTotal">0.00</span>
+        </div>
+    </div>
+
+    <!-- BILLING SUMMARY -->
     <div class="row row-highlight">
         <span class="label">TOTAL AMOUNT<span class="sub-label">(जम्मा)</span></span>
-        <span class="amount">3,52,656.00</span>
+        <span class="amount" id="totalAmount">3,52,656.00</span>
     </div>
 
     <div class="row">
         <span class="label">DISCOUNT<span class="sub-label">(छुट)</span></span>
-        <input type="number" class="input-box" value="0">
+        <input type="number" id="discount" class="input-box" value="0">
     </div>
 
     <div class="row">
         <span class="label">AMT WITH DISCOUNT</span>
-        <span class="amount">3,52,656.00</span>
+        <span class="amount" id="amtWithDiscount">3,52,656.00</span>
     </div>
 
     <div class="row">
         <span class="label">TAX<span class="sub-label">(कर)</span></span>
         <div>
-            <input type="text" class="input-box" value="0.50" style="width: 60px; margin-right: 8px;">
-            <span class="amount">1,763.28</span>
+            <input type="text" id="taxPercent" class="input-box" value="0.50" style="width: 50px; margin-right: 8px;">
+            <span class="amount" id="taxAmount">1,763.28</span>
         </div>
     </div>
 
     <div class="row row-green">
         <span class="label text-green">GRAND TOTAL<span class="sub-label text-green">(जम्मा)</span></span>
-        <span class="amount text-green">3,54,419.28</span>
+        <span class="amount text-green" id="grandTotal">3,54,419.28</span>
     </div>
 
     <div class="row">
         <span class="label">ADVANCE<span class="sub-label">(अग्रिम रकम)</span></span>
-        <input type="number" class="input-box" value="0">
+        <input type="number" id="advance" class="input-box" value="0">
     </div>
 
     <div class="row row-red">
         <span class="label text-red">REMAINING<span class="sub-label text-red">(बाँकी रकम)</span></span>
-        <span class="amount text-red">3,54,419.28</span>
+        <span class="amount text-red" id="remaining">3,54,419.28</span>
     </div>
 
     <div class="action-area">
@@ -182,17 +212,18 @@
 <script>
     let contactsDatabase = {};
 
-    // Replace with your Google Apps Script Web App URL:
-    const GOOGLE_SCRIPT_URL = 'https://docs.google.com/spreadsheets/d/1IxI6n1hJwRmSmDA8M4fIXbX0jS9N2JLJwxR8j90lBik/edit?usp=drivesdk';
+    // 📍 Paste your deployed Google Apps Script Web App URL below:
+    const GOOGLE_SCRIPT_URL = 'YOUR_DEPLOYED_WEB_APP_URL_HERE';
 
     // Fetch live contacts from Google Sheet
     async function loadContactsFromSheet() {
+        if (GOOGLE_SCRIPT_URL === 'https://docs.google.com/spreadsheets/d/1IxI6n1hJwRmSmDA8M4fIXbX0jS9N2JLJwxR8j90lBik/edit?usp=drivesdk') return;
         try {
             const response = await fetch(GOOGLE_SCRIPT_URL);
             contactsDatabase = await response.json();
             
             const datalist = document.getElementById('customerList');
-            datalist.innerHTML = ''; // Clear existing
+            datalist.innerHTML = ''; 
             
             Object.keys(contactsDatabase).forEach(name => {
                 const option = document.createElement('option');
@@ -204,7 +235,7 @@
         }
     }
 
-    // Auto-update phone number on input/select
+    // Auto-update phone number on typing/selecting customer name
     function updatePhoneNumber() {
         const nameInput = document.getElementById('customerName').value.trim();
         const phoneInput = document.getElementById('phoneNumber');
@@ -216,7 +247,6 @@
         }
     }
 
-    // Initialize contact fetching on page load
     window.onload = loadContactsFromSheet;
 </script>
 
