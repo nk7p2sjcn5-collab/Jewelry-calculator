@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jewelry Billing & Estimate Calculator</title>
+  <style>
+    :root {
+      --primary: #1e293b;
+      --accent: #d97706;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .calculator-card {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 650px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+      border: 1px solid var(--border);
+      padding: 24px;
+    }
+
+    .header {
+      text-align: center;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+    }
+
+    .header h2 {
+      font-size: 1.5rem;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .header p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+
+    .meta-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    label span {
+      font-size: 0.8rem;
+      font-weight: normal;
+    }
+
+    input {
+      padding: 10px 12px;
+      border: 1fr solid var(--border);
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+    }
+
+    .calc-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    .calc-table th, .calc-table td {
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .calc-table th {
+      text-align: left;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      background: #f1f5f9;
+    }
+
+    .calc-table td.label-cell {
+      font-weight: 600;
+      font-size: 0.9rem;
+      width: 55%;
+    }
+
+    .calc-table td.input-cell {
+      width: 20%;
+    }
+
+    .calc-table td.output-cell {
+      width: 25%;
+      text-align: right;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--primary);
+    }
+
+    .calc-table input {
+      width: 100%;
+      text-align: right;
+      padding: 6px 8px;
+    }
+
+    .highlight-row {
+      background-color: #fffbe3;
+    }
+
+    .grand-total-row {
+      background-color: #f0fdf4;
+      font-size: 1.05rem;
+    }
+
+    .grand-total-row td {
+      border-top: 2px solid #22c55e;
+      border-bottom: 2px solid #22c55e;
+      color: #15803d;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #0f172a;
+    }
+
+    .btn-secondary {
+      background: #e2e8f0;
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: #cbd5e1;
+    }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .calculator-card { box-shadow: none; border: none; width: 100%; max-width: 100%; }
+      .actions, input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { display: none; }
+      input { border: none; background: transparent; text-align: right; padding: 0; }
+      .calc-table input { width: auto; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="calculator-card">
+  <div class="header">
+    <h2>Estimate / Billing Sheet</h2>
+    <p>SILVER (चाँदी) Tola Calculator</p>
+  </div>
+
+  <div class="meta-fields">
+    <div class="field-group">
+      <label>Date (मिति)</label>
+      <input type="date" id="docDate">
+    </div>
+    <div class="field-group">
+      <label>Item Name (सामानको नाम)</label>
+      <input type="text" id="itemName" placeholder="e.g. Silver Chain">
+    </div>
+  </div>
+
+  <table class="calc-table">
+    <thead>
+      <tr>
+        <th>Description (विवरण)</th>
+        <th style="text-align: right;">Rate / %</th>
+        <th style="text-align: right;">Amount / Wt</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="label-cell">WEIGHT (तौल) <br><small>in Tola</small></td>
+        <td class="input-cell"></td>
+        <td class="input-cell"><input type="number" id="weight" value="72.00" step="0.01" oninput="calculate()"></td>
+      </tr>
+      <tr>
+        <td class="label-cell">JARTI % (जर्ती)</td>
+        <td class="input-cell"><input type="number" id="jartiPercent" value="8" step="0.1" oninput="calculate()"></td>
+        <td class="output-cell" id="jartiWt">0.00</td>
+      </tr>
+      <tr class="highlight-row">
+        <td class="label-cell">TOTAL WT (जर्ती समेत तौल)</td>
+        <td></td>
+        <td class="output-cell" id="totalWtWithJarti">0.00</td>
+      </tr>
+      <tr>
+        <td class="label-cell">Silver Given (चाँदी दिएको)</td>
+        <td></td>
+        <td class="input-cell"><input type="number" id="silverGiven" value="0.00" step="0.01" oninput="calculate()"></td>
+      </tr>
+      <tr class="highlight-row">
+        <td class="label-cell">NET WT (जम्मा तौल)</td>
+        <td></td>
+        <td class="output-cell" id="netWt">0.00</td>
+      </tr>
+      <tr>
+        <td class="label-cell">RATE (दर) <br><small>per Tola</small></td>
+        <td class="input-cell"><input type="number" id="rate" value="4350" step="1" oninput="calculate()"></td>
+        <td class="output-cell" id="silverCost">0.00</td>
+      </tr>
+      <tr>
+        <td class="label-cell">JYALA PER TOLA (तोला ज्याला)</td>
+        <td class="input-cell"><input type="number" id="jyalaPerTola" value="200" step="1" oninput="calculate()"></td>
+        <td class="output-cell" id="totalJyalaTola">0.00</td>
+      </tr>
+      <tr>
+        <td class="label-cell">JYALA PER ITEM (प्रति सामान ज्याला)</td>
+        <td></td>
+        <td class="input-cell"><input type="number" id="jyalaPerItem" value="0" step="1" oninput="calculate()"></td>
+      </tr>
+      <tr class="highlight-row">
+        <td class="label-cell">TOTAL AMOUNT (जम्मा रकम)</td>
+        <td></td>
+        <td class="output-cell" id="subTotal">0.00</td>
+      </tr>
+      <tr>
+        <td class="label-cell">DISCOUNT (छुट)</td>
+        <td></td>
+        <td class="input-cell"><input type="number" id="discount" value="0" step="1" oninput="calculate()"></td>
+      </tr>
+      <tr>
+        <td class="label-cell">AMOUNT WITH DISCOUNT (छुट पछिको)</td>
+        <td></td>
+        <td class="output-cell" id="amtAfterDiscount">0.00</td>
+      </tr>
+      <tr>
+        <td class="label-cell">TAX (कर)</td>
+        <td class="input-cell"><input type="number" id="taxPercent" value="0.50" step="0.01" oninput="calculate()"></td>
+        <td class="output-cell" id="taxAmt">0.00</td>
+      </tr>
+      <tr class="grand-total-row">
+        <td class="label-cell">GRAND TOTAL (जम्मा रकम)</td>
+        <td></td>
+        <td class="output-cell" id="grandTotal">0.00</td>
+      </tr>
+      <tr>
+        <td class="label-cell">ADVANCE AMOUNT (अग्रिम रकम)</td>
+        <td></td>
+        <td class="input-cell"><input type="number" id="advanceAmt" value="0" step="1" oninput="calculate()"></td>
+      </tr>
+      <tr style="background: #fef2f2;">
+        <td class="label-cell" style="color: #991b1b;">REMAINING AMOUNT (बाँकी रकम)</td>
+        <td></td>
+        <td class="output-cell" id="remainingAmt" style="color: #991b1b;">0.00</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="actions">
+    <button class="btn btn-secondary" onclick="window.print()">Print / Save PDF</button>
+  </div>
+</div>
+
+<script>
+  // Set default current date
+  document.getElementById('docDate').valueAsDate = new Date();
+
+  function formatNum(num) {
+    return num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function calculate() {
+    const weight = parseFloat(document.getElementById('weight').value) || 0;
+    const jartiPercent = parseFloat(document.getElementById('jartiPercent').value) || 0;
+    const silverGiven = parseFloat(document.getElementById('silverGiven').value) || 0;
+    const rate = parseFloat(document.getElementById('rate').value) || 0;
+    const jyalaPerTola = parseFloat(document.getElementById('jyalaPerTola').value) || 0;
+    const jyalaPerItem = parseFloat(document.getElementById('jyalaPerItem').value) || 0;
+    const discount = parseFloat(document.getElementById('discount').value) || 0;
+    const taxPercent = parseFloat(document.getElementById('taxPercent').value) || 0;
+    const advanceAmt = parseFloat(document.getElementById('advanceAmt').value) || 0;
+
+    // 1. Jarti Weight
+    const jartiWt = weight * (jartiPercent / 100);
+    document.getElementById('jartiWt').innerText = formatNum(jartiWt);
+
+    // 2. Total Weight with Jarti
+    const totalWtWithJarti = weight + jartiWt;
+    document.getElementById('totalWtWithJarti').innerText = formatNum(totalWtWithJarti);
+
+    // 3. Net Weight after deducting given silver
+    const netWt = totalWtWithJarti - silverGiven;
+    document.getElementById('netWt').innerText = formatNum(netWt);
+
+    // 4. Silver Cost
+    const silverCost = netWt * rate;
+    document.getElementById('silverCost').innerText = formatNum(silverCost);
+
+    // 5. Making Charge (Jyala) per Tola based on original weight
+    const totalJyalaTola = weight * jyalaPerTola;
+    document.getElementById('totalJyalaTola').innerText = formatNum(totalJyalaTola);
+
+    // 6. Sub Total
+    const subTotal = silverCost + totalJyalaTola + jyalaPerItem;
+    document.getElementById('subTotal').innerText = formatNum(subTotal);
+
+    // 7. Discount
+    const amtAfterDiscount = subTotal - discount;
+    document.getElementById('amtAfterDiscount').innerText = formatNum(amtAfterDiscount);
+
+    // 8. Tax
+    const taxAmt = amtAfterDiscount * (taxPercent / 100);
+    document.getElementById('taxAmt').innerText = formatNum(taxAmt);
+
+    // 9. Grand Total
+    const grandTotal = amtAfterDiscount + taxAmt;
+    document.getElementById('grandTotal').innerText = formatNum(grandTotal);
+
+    // 10. Remaining Amount
+    const remainingAmt = grandTotal - advanceAmt;
+    document.getElementById('remainingAmt').innerText = formatNum(remainingAmt);
+  }
+
+  // Initial calculation run
+  calculate();
+</script>
+
+</body>
+</html>
