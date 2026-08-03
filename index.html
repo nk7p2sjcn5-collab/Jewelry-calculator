@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jewelry Billing Calculator</title>
+    <title>Jewelry Billing Estimate Calculator</title>
     <style>
         * {
             box-sizing: border-box;
@@ -16,16 +16,36 @@
             background-color: #f5f5f7;
             display: flex;
             justify-content: center;
-            padding: 16px;
+            padding: 20px 10px;
         }
 
         .billing-card {
             width: 100%;
-            max-width: 480px;
+            max-width: 500px;
             background: #ffffff;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            padding: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+        }
+
+        .header-section {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 1px;
+            color: #1e293b;
+            padding: 6px 0;
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            margin-bottom: 12px;
         }
 
         .row {
@@ -34,7 +54,7 @@
             align-items: center;
             padding: 8px 0;
             border-bottom: 1px solid #f0f0f0;
-            font-size: 14px;
+            font-size: 13.5px;
         }
 
         .row-highlight {
@@ -42,13 +62,22 @@
             padding: 10px;
             border-radius: 6px;
             border-bottom: none;
-            margin: 6px 0;
+            margin: 4px 0;
+        }
+
+        .row-bold-total {
+            background-color: #f8fafc;
+            border-top: 1.5px solid #cbd5e1;
+            border-bottom: 1.5px solid #cbd5e1;
+            padding: 10px 4px;
+            margin: 4px 0;
+            font-weight: 700;
         }
 
         .row-green {
             border-top: 2px solid #2e7d32;
             border-bottom: 2px solid #2e7d32;
-            padding: 10px 0;
+            padding: 10px 4px;
             margin: 8px 0;
         }
 
@@ -66,19 +95,25 @@
         }
 
         .sub-label {
-            font-size: 12px;
+            font-size: 11.5px;
             color: #666666;
-            display: block;
+            margin-left: 4px;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .input-box {
-            width: 110px;
+            width: 90px;
             padding: 6px 8px;
             border: 1px solid #cccccc;
             border-radius: 6px;
             text-align: right;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13.5px;
         }
 
         .input-full {
@@ -90,14 +125,15 @@
             font-weight: 700;
             color: #111111;
             text-align: right;
-            font-size: 15px;
+            min-width: 90px;
+            font-size: 14px;
         }
 
         .text-green { color: #2e7d32; }
         .text-red { color: #c62828; }
 
         .action-area {
-            margin-top: 16px;
+            margin-top: 18px;
         }
 
         .btn-print {
@@ -122,87 +158,129 @@
 
 <div class="billing-card">
 
-    <!-- CUSTOMER DETAILS -->
+    <!-- 1. CUSTOMER & HEADER DETAILS (TOP SECTION) -->
+    <div class="header-section">
+        <div class="row" style="border-bottom: none; padding: 4px 0;">
+            <span class="label">CUSTOMER NAME <span class="sub-label">(ग्राहकको नाम)</span></span>
+            <input type="text" id="customerName" class="input-box input-full" list="customerList" placeholder="Type or select name..." oninput="updatePhoneNumber()">
+            <datalist id="customerList"></datalist>
+        </div>
+
+        <div class="row" style="border-bottom: none; padding: 4px 0;">
+            <span class="label">PHONE NUMBER <span class="sub-label">(फोन नम्बर)</span></span>
+            <input type="text" id="phoneNumber" class="input-box input-full" placeholder="Auto-filled phone" readonly>
+        </div>
+
+        <div class="row" style="border-bottom: none; padding: 4px 0;">
+            <span class="label">DATE <span class="sub-label">(मिति)</span></span>
+            <input type="date" id="billDate" class="input-box input-full" style="width: 140px;">
+        </div>
+
+        <div class="row" style="border-bottom: none; padding: 4px 0;">
+            <span class="label">ITEM <span class="sub-label">(सामान)</span></span>
+            <input type="text" id="itemName" class="input-box input-full" placeholder="e.g. Silver Ring">
+        </div>
+    </div>
+
+    <!-- ESTIMATE TITLE HEADER -->
+    <div class="section-title">ESTIMATE</div>
+    <div class="section-title" style="background-color: #f1f5f9; font-size: 14px;">SILVER (चाँदी) Tola</div>
+
+    <!-- 2. WEIGHT CALCULATIONS -->
     <div class="row">
-        <span class="label">CUSTOMER NAME<span class="sub-label">(ग्राहकको नाम)</span></span>
-        <input type="text" id="customerName" class="input-box input-full" list="customerList" placeholder="Type name..." oninput="updatePhoneNumber()">
-        <datalist id="customerList"></datalist>
+        <span class="label">WEIGHTT <span class="sub-label">(तौल)</span></span>
+        <input type="number" id="weight" class="input-box" value="72.00" step="0.01">
     </div>
 
     <div class="row">
-        <span class="label">PHONE NUMBER<span class="sub-label">(फोन नम्बर)</span></span>
-        <input type="text" id="phoneNumber" class="input-box input-full" placeholder="Auto-filled phone" readonly>
+        <span class="label">JARTI% <span class="sub-label">(जर्ती)</span></span>
+        <div class="input-group">
+            <input type="number" id="jartiPercent" class="input-box" value="8" style="width: 60px;"> %
+            <span class="amount" id="jartiAmount">5.76</span>
+        </div>
     </div>
 
-    <!-- UPPER CALCULATION FIELDS -->
+    <div class="row row-bold-total">
+        <span class="label">TOTAL WT <span class="sub-label">(जर्ती समेत तौल)</span></span>
+        <span class="amount" id="totalWtWithJarti">77.76</span>
+    </div>
+
     <div class="row">
-        <span class="label">WEIGHT (TOLA)<span class="sub-label">(तौला)</span></span>
-        <input type="number" id="weight" class="input-box" value="0.00">
+        <span class="label">Silver Given <span class="sub-label">(चाँदी दिएको)</span></span>
+        <input type="number" id="silverGiven" class="input-box" value="0.00" step="0.01">
     </div>
 
-    <div class="row row-highlight">
-        <span class="label">GOLD RATE / TOTAL<span class="sub-label">(दर / जम्मा)</span></span>
-        <div>
-            <input type="number" id="rate" class="input-box" value="4350" style="margin-right: 8px;">
-            <span class="amount" id="goldTotal">3,38,256.00</span>
+    <div class="row row-bold-total">
+        <span class="label">TOTAL WT <span class="sub-label">(जम्मा तौल)</span></span>
+        <span class="amount" id="finalTotalWt">77.76</span>
+    </div>
+
+    <!-- 3. RATES & JYALA -->
+    <div class="row">
+        <span class="label">RATE <span class="sub-label">(दर)</span></span>
+        <div class="input-group">
+            <input type="number" id="rate" class="input-box" value="4350">
+            <span class="amount" id="rateTotal">338,256.00</span>
         </div>
     </div>
 
     <div class="row">
-        <span class="label">JYALA / TOLA<span class="sub-label">(तौला ज्याला)</span></span>
-        <div>
-            <input type="number" id="jyalaTola" class="input-box" value="200" style="margin-right: 8px;">
+        <span class="label">JYALA PER TOLA <span class="sub-label">(तोला ज्याला)</span></span>
+        <div class="input-group">
+            <input type="number" id="jyalaTola" class="input-box" value="200">
             <span class="amount" id="jyalaTolaTotal">14,400.00</span>
         </div>
     </div>
 
     <div class="row">
-        <span class="label">JYALA / ITEM<span class="sub-label">(प्रति ज्याला)</span></span>
-        <div>
-            <input type="number" id="jyalaItem" class="input-box" value="0" style="margin-right: 8px;">
+        <span class="label">JYALA PER ITEM <span class="sub-label">(प्रति सामान ज्याला)</span></span>
+        <div class="input-group">
+            <input type="number" id="jyalaItem" class="input-box" value="0">
             <span class="amount" id="jyalaItemTotal">0.00</span>
         </div>
     </div>
 
-    <!-- BILLING SUMMARY -->
+    <!-- 4. TOTALS & TAX -->
     <div class="row row-highlight">
-        <span class="label">TOTAL AMOUNT<span class="sub-label">(जम्मा)</span></span>
-        <span class="amount" id="totalAmount">3,52,656.00</span>
+        <span class="label">TOTAL AMOUNT <span class="sub-label">(जम्मा रकम)</span></span>
+        <span class="amount" id="totalAmount">352,656.00</span>
     </div>
 
     <div class="row">
-        <span class="label">DISCOUNT<span class="sub-label">(छुट)</span></span>
+        <span class="label">DISCOUNT <span class="sub-label">(छुट)</span></span>
         <input type="number" id="discount" class="input-box" value="0">
     </div>
 
     <div class="row">
-        <span class="label">AMT WITH DISCOUNT</span>
-        <span class="amount" id="amtWithDiscount">3,52,656.00</span>
+        <span class="label">AMOUNT WITH DISCOUNT <span class="sub-label">(छुट पछिको रकम)</span></span>
+        <span class="amount" id="amtWithDiscount">352,656.00</span>
     </div>
 
     <div class="row">
-        <span class="label">TAX<span class="sub-label">(कर)</span></span>
-        <div>
-            <input type="text" id="taxPercent" class="input-box" value="0.50" style="width: 50px; margin-right: 8px;">
+        <span class="label">TAX <span class="sub-label">(कर)</span></span>
+        <div class="input-group">
+            <input type="text" id="taxPercent" class="input-box" value="0.50" style="width: 50px;"> %
             <span class="amount" id="taxAmount">1,763.28</span>
         </div>
     </div>
 
     <div class="row row-green">
-        <span class="label text-green">GRAND TOTAL<span class="sub-label text-green">(जम्मा)</span></span>
-        <span class="amount text-green" id="grandTotal">3,54,419.28</span>
+        <span class="label text-green">TOTAL AMOUNT <span class="sub-label text-green">(जम्मा रकम)</span></span>
+        <span class="amount text-green" id="grandTotal">354,419.28</span>
     </div>
 
+    <!-- 5. ADVANCE & REMAINING -->
     <div class="row">
-        <span class="label">ADVANCE<span class="sub-label">(अग्रिम रकम)</span></span>
+        <span class="label">ADVANCE AMOUNT <span class="sub-label">(अग्रिम रकम)</span></span>
         <input type="number" id="advance" class="input-box" value="0">
     </div>
 
     <div class="row row-red">
-        <span class="label text-red">REMAINING<span class="sub-label text-red">(बाँकी रकम)</span></span>
-        <span class="amount text-red" id="remaining">3,54,419.28</span>
+        <span class="label text-red">REMAINING AMOUNT <span class="sub-label">(बाँकी रकम)</span></span>
+        <span class="amount text-red" id="remainingAmount">354,419.28</span>
     </div>
 
+    <!-- ACTION BUTTON -->
     <div class="action-area">
         <button type="button" class="btn-print" onclick="window.print()">Print / Save PDF</button>
     </div>
@@ -212,12 +290,15 @@
 <script>
     let contactsDatabase = {};
 
-    // 📍 Paste your deployed Google Apps Script Web App URL below:
-    const GOOGLE_SCRIPT_URL = 'YOUR_DEPLOYED_WEB_APP_URL_HERE';
+    // 📍 Paste your Google Apps Script Web App URL below:
+    const GOOGLE_SCRIPT_URL = 'https://docs.google.com/spreadsheets/d/1IxI6n1hJwRmSmDA8M4fIXbX0jS9N2JLJwxR8j90lBik/edit?usp=drivesdk';
+
+    // Auto set today's date
+    document.getElementById('billDate').valueAsDate = new Date();
 
     // Fetch live contacts from Google Sheet
     async function loadContactsFromSheet() {
-        if (GOOGLE_SCRIPT_URL === 'https://docs.google.com/spreadsheets/d/1IxI6n1hJwRmSmDA8M4fIXbX0jS9N2JLJwxR8j90lBik/edit?usp=drivesdk') return;
+        if (GOOGLE_SCRIPT_URL === 'YOUR_DEPLOYED_WEB_APP_URL_HERE') return;
         try {
             const response = await fetch(GOOGLE_SCRIPT_URL);
             contactsDatabase = await response.json();
