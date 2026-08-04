@@ -290,33 +290,50 @@
 <script>
     let contactsDatabase = {};
 
-    // 📍 Paste your Google Apps Script Web App URL below:
-    const GOOGLE_SCRIPT_URL = 'https://docs.google.com/spreadsheets/d/1IxI6n1hJwRmSmDA8M4fIXbX0jS9N2JLJwxR8j90lBik/edit?usp=drivesdk';
+    // Live Google Sheet CSV Export Link
+    const SPREADSHEET_ID = '1IxI6n1hJwRmSmDA8M4fIXbX0jS9N2JLJwxR8j90lBik';
+    const CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv`;
 
     // Auto set today's date
     document.getElementById('billDate').valueAsDate = new Date();
 
-    // Fetch live contacts from Google Sheet
-    async function loadContactsFromSheet() {
-        if (GOOGLE_SCRIPT_URL === 'YOUR_DEPLOYED_WEB_APP_URL_HERE') return;
+    // Live Fetch CSV Data directly from Google Sheet
+    async function fetchLiveContacts() {
         try {
-            const response = await fetch(GOOGLE_SCRIPT_URL);
-            contactsDatabase = await response.json();
+            const response = await fetch(CSV_URL);
+            const csvText = await response.text();
             
+            // Parse CSV lines
+            const lines = csvText.split('\n');
             const datalist = document.getElementById('customerList');
             datalist.innerHTML = ''; 
-            
-            Object.keys(contactsDatabase).forEach(name => {
-                const option = document.createElement('option');
-                option.value = name;
-                datalist.appendChild(option);
-            });
+            contactsDatabase = {};
+
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+                
+                // Parse CSV columns
+                const cols = lines[i].split(',').map(col => col.replace(/^"|"$/g, '').trim());
+                
+                const name = cols[1];      // Column B: NAMES
+                const mobile = cols[2];    // Column C: MOBILE NO.
+                const landline = cols[3];  // Column D: LANDLINE
+
+                if (name) {
+                    const phone = mobile || landline || '';
+                    contactsDatabase[name] = phone;
+
+                    const option = document.createElement('option');
+                    option.value = name;
+                    datalist.appendChild(option);
+                }
+            }
         } catch (error) {
-            console.error("Error fetching Google Sheet contacts:", error);
+            console.error("Error fetching live contacts:", error);
         }
     }
 
-    // Auto-update phone number on typing/selecting customer name
+    // Auto-update phone number when customer selected
     function updatePhoneNumber() {
         const nameInput = document.getElementById('customerName').value.trim();
         const phoneInput = document.getElementById('phoneNumber');
@@ -328,7 +345,7 @@
         }
     }
 
-    window.onload = loadContactsFromSheet;
+    window.onload = fetchLiveContacts;
 </script>
 
 </body>
