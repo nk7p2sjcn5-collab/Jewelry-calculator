@@ -300,18 +300,18 @@
 
     // MAIN BILLING CALCULATION ENGINE
     function calculateBill() {
-        const weight = parseFloat(document.getElementById('weight').value) || 0;
-        const jartiPercent = parseFloat(document.getElementById('jartiPercent').value) || 0;
-        const silverGiven = parseFloat(document.getElementById('silverGiven').value) || 0;
-        const rate = parseFloat(document.getElementById('rate').value) || 0;
-        const jyalaTola = parseFloat(document.getElementById('jyalaTola').value) || 0;
-        const jyalaItem = parseFloat(document.getElementById('jyalaItem').value) || 0;
-        const discount = parseFloat(document.getElementById('discount').value) || 0;
-        const taxPercent = parseFloat(document.getElementById('taxPercent').value) || 0;
-        const advance = parseFloat(document.getElementById('advance').value) || 0;
+        let weight = parseFloat(document.getElementById('weight').value) || 0;
+        let jartiPercent = parseFloat(document.getElementById('jartiPercent').value) || 0;
+        let silverGiven = parseFloat(document.getElementById('silverGiven').value) || 0;
+        let rate = parseFloat(document.getElementById('rate').value) || 0;
+        let jyalaTola = parseFloat(document.getElementById('jyalaTola').value) || 0;
+        let jyalaItem = parseFloat(document.getElementById('jyalaItem').value) || 0;
+        let discount = parseFloat(document.getElementById('discount').value) || 0;
+        let taxPercent = parseFloat(document.getElementById('taxPercent').value) || 0;
+        let advance = parseFloat(document.getElementById('advance').value) || 0;
 
         // Calculations
-        const jartiAmountVal = weight * (jartiPercent / 100);
+        let jartiAmountVal = roundDown2(weight * (jartiPercent / 100));
         const totalWtWithJartiVal = weight + jartiAmountVal;
         const finalTotalWtVal = totalWtWithJartiVal - silverGiven;
 
