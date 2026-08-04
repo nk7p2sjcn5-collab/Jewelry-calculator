@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ne">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jewelry Billing Estimate Calculator</title>
+    <title>Jewelry Billing Estimate Calculator (Nepali Date)</title>
     <style>
         * {
             box-sizing: border-box;
@@ -172,8 +172,8 @@
         </div>
 
         <div class="row" style="border-bottom: none; padding: 4px 0;">
-            <span class="label">DATE <span class="sub-label">(मिति)</span></span>
-            <input type="date" id="billDate" class="input-box input-full" style="width: 140px;">
+            <span class="label">DATE (B.S.) <span class="sub-label">(नेपाली मिति)</span></span>
+            <input type="text" id="billDateBs" class="input-box input-full" placeholder="YYYY-MM-DD" style="width: 140px; text-align: center;">
         </div>
 
         <div class="row" style="border-bottom: none; padding: 4px 0;">
@@ -294,8 +294,36 @@
     const SPREADSHEET_ID = '1IxI6n1hJwRmSmDA8M4fIXbX0jS9N2JLJwxR8j90lBik';
     const CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv`;
 
-    // Auto set today's date
-    document.getElementById('billDate').valueAsDate = new Date();
+    // English AD to Nepali BS Date Converter logic
+    function getTodayNepaliDate() {
+        const now = new Date();
+        const adYear = now.getFullYear();
+        const adMonth = now.getMonth() + 1;
+        const adDay = now.getDate();
+
+        // Approximate BS conversion logic (AD + 56 Years 8 Months 15 Days)
+        let bsYear = adYear + 56;
+        let bsMonth = adMonth + 8;
+        let bsDay = adDay + 15;
+
+        if (bsDay > 30) {
+            bsDay -= 30;
+            bsMonth += 1;
+        }
+
+        if (bsMonth > 12) {
+            bsMonth -= 12;
+            bsYear += 1;
+        }
+
+        const formattedMonth = bsMonth < 10 ? `0${bsMonth}` : bsMonth;
+        const formattedDay = bsDay < 10 ? `0${bsDay}` : bsDay;
+
+        return `${bsYear}-${formattedMonth}-${formattedDay}`;
+    }
+
+    // Set default Nepali date in header field
+    document.getElementById('billDateBs').value = getTodayNepaliDate();
 
     // Live Fetch CSV Data directly from Google Sheet
     async function fetchLiveContacts() {
@@ -303,7 +331,6 @@
             const response = await fetch(CSV_URL);
             const csvText = await response.text();
             
-            // Parse CSV lines
             const lines = csvText.split('\n');
             const datalist = document.getElementById('customerList');
             datalist.innerHTML = ''; 
@@ -312,7 +339,6 @@
             for (let i = 1; i < lines.length; i++) {
                 if (!lines[i].trim()) continue;
                 
-                // Parse CSV columns
                 const cols = lines[i].split(',').map(col => col.replace(/^"|"$/g, '').trim());
                 
                 const name = cols[1];      // Column B: NAMES
