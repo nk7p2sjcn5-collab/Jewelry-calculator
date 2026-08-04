@@ -293,6 +293,11 @@
     const SPREADSHEET_ID = '1IxI6n1hJwRmSmDA8M4fIXbX0jS9N2JLJwxR8j90lBik';
     const CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv`;
 
+    // Helper function to truncate/round DOWN to exactly 2 decimal places
+    function roundDown2(num) {
+        return Math.floor((num || 0) * 100) / 100;
+    }
+
     // Helper function for currency formatting (e.g. 354,419.28)
     function fmt(num) {
         return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -310,20 +315,20 @@
         let taxPercent = parseFloat(document.getElementById('taxPercent').value) || 0;
         let advance = parseFloat(document.getElementById('advance').value) || 0;
 
-        // Calculations
+        // Calculations (Round DOWN to 2 decimal places at each step)
         let jartiAmountVal = roundDown2(weight * (jartiPercent / 100));
-        const totalWtWithJartiVal = weight + jartiAmountVal;
-        const finalTotalWtVal = totalWtWithJartiVal - silverGiven;
+        let totalWtWithJartiVal = roundDown2(weight + jartiAmountVal);
+        let finalTotalWtVal = roundDown2(totalWtWithJartiVal - silverGiven);
 
-        const rateTotalVal = finalTotalWtVal * rate;
-        const jyalaTolaTotalVal = finalTotalWtVal * jyalaTola;
-        const jyalaItemTotalVal = jyalaItem;
+        let rateTotalVal = roundDown2(finalTotalWtVal * rate);
+        let jyalaTolaTotalVal = roundDown2(finalTotalWtVal * jyalaTola);
+        let jyalaItemTotalVal = roundDown2(jyalaItem);
 
-        const totalAmountVal = rateTotalVal + jyalaTolaTotalVal + jyalaItemTotalVal;
-        const amtWithDiscountVal = totalAmountVal - discount;
-        const taxAmountVal = amtWithDiscountVal * (taxPercent / 100);
-        const grandTotalVal = amtWithDiscountVal + taxAmountVal;
-        const remainingAmountVal = grandTotalVal - advance;
+        let totalAmountVal = roundDown2(rateTotalVal + jyalaTolaTotalVal + jyalaItemTotalVal);
+        let amtWithDiscountVal = roundDown2(totalAmountVal - discount);
+        let taxAmountVal = roundDown2(amtWithDiscountVal * (taxPercent / 100));
+        let grandTotalVal = roundDown2(amtWithDiscountVal + taxAmountVal);
+        let remainingAmountVal = roundDown2(grandTotalVal - advance);
 
         // Render to UI
         document.getElementById('jartiAmount').innerText = jartiAmountVal.toFixed(2);
