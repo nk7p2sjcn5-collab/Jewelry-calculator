@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jewelry Billing Estimate Calculator (Nepali Date)</title>
+    <title>Jewelry Billing Estimate Calculator</title>
     <style>
         * {
             box-sizing: border-box;
@@ -158,7 +158,7 @@
 
 <div class="billing-card">
 
-    <!-- 1. CUSTOMER & HEADER DETAILS (TOP SECTION) -->
+    <!-- 1. CUSTOMER & HEADER DETAILS -->
     <div class="header-section">
         <div class="row" style="border-bottom: none; padding: 4px 0;">
             <span class="label">CUSTOMER NAME <span class="sub-label">(ग्राहकको नाम)</span></span>
@@ -189,13 +189,13 @@
     <!-- 2. WEIGHT CALCULATIONS -->
     <div class="row">
         <span class="label">WEIGHTT <span class="sub-label">(तौल)</span></span>
-        <input type="number" id="weight" class="input-box" value="72.00" step="0.01">
+        <input type="number" id="weight" class="input-box" value="72.00" step="0.01" oninput="calculateBill()">
     </div>
 
     <div class="row">
         <span class="label">JARTI% <span class="sub-label">(जर्ती)</span></span>
         <div class="input-group">
-            <input type="number" id="jartiPercent" class="input-box" value="8" style="width: 60px;"> %
+            <input type="number" id="jartiPercent" class="input-box" value="8" style="width: 60px;" step="0.01" oninput="calculateBill()"> %
             <span class="amount" id="jartiAmount">5.76</span>
         </div>
     </div>
@@ -207,7 +207,7 @@
 
     <div class="row">
         <span class="label">Silver Given <span class="sub-label">(चाँदी दिएको)</span></span>
-        <input type="number" id="silverGiven" class="input-box" value="0.00" step="0.01">
+        <input type="number" id="silverGiven" class="input-box" value="0.00" step="0.01" oninput="calculateBill()">
     </div>
 
     <div class="row row-bold-total">
@@ -219,7 +219,7 @@
     <div class="row">
         <span class="label">RATE <span class="sub-label">(दर)</span></span>
         <div class="input-group">
-            <input type="number" id="rate" class="input-box" value="4350">
+            <input type="number" id="rate" class="input-box" value="4350" oninput="calculateBill()">
             <span class="amount" id="rateTotal">338,256.00</span>
         </div>
     </div>
@@ -227,7 +227,7 @@
     <div class="row">
         <span class="label">JYALA PER TOLA <span class="sub-label">(तोला ज्याला)</span></span>
         <div class="input-group">
-            <input type="number" id="jyalaTola" class="input-box" value="200">
+            <input type="number" id="jyalaTola" class="input-box" value="200" oninput="calculateBill()">
             <span class="amount" id="jyalaTolaTotal">14,400.00</span>
         </div>
     </div>
@@ -235,7 +235,7 @@
     <div class="row">
         <span class="label">JYALA PER ITEM <span class="sub-label">(प्रति सामान ज्याला)</span></span>
         <div class="input-group">
-            <input type="number" id="jyalaItem" class="input-box" value="0">
+            <input type="number" id="jyalaItem" class="input-box" value="0" oninput="calculateBill()">
             <span class="amount" id="jyalaItemTotal">0.00</span>
         </div>
     </div>
@@ -248,7 +248,7 @@
 
     <div class="row">
         <span class="label">DISCOUNT <span class="sub-label">(छुट)</span></span>
-        <input type="number" id="discount" class="input-box" value="0">
+        <input type="number" id="discount" class="input-box" value="0" oninput="calculateBill()">
     </div>
 
     <div class="row">
@@ -259,7 +259,7 @@
     <div class="row">
         <span class="label">TAX <span class="sub-label">(कर)</span></span>
         <div class="input-group">
-            <input type="text" id="taxPercent" class="input-box" value="0.50" style="width: 50px;"> %
+            <input type="number" id="taxPercent" class="input-box" value="0.50" style="width: 60px;" step="0.01" oninput="calculateBill()"> %
             <span class="amount" id="taxAmount">1,763.28</span>
         </div>
     </div>
@@ -272,7 +272,7 @@
     <!-- 5. ADVANCE & REMAINING -->
     <div class="row">
         <span class="label">ADVANCE AMOUNT <span class="sub-label">(अग्रिम रकम)</span></span>
-        <input type="number" id="advance" class="input-box" value="0">
+        <input type="number" id="advance" class="input-box" value="0" oninput="calculateBill()">
     </div>
 
     <div class="row row-red">
@@ -290,31 +290,70 @@
 <script>
     let contactsDatabase = {};
 
-    // Live Google Sheet CSV Export Link
     const SPREADSHEET_ID = '1IxI6n1hJwRmSmDA8M4fIXbX0jS9N2JLJwxR8j90lBik';
     const CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv`;
 
-    // English AD to Nepali BS Date Converter logic
+    // Helper function for currency formatting (e.g. 354,419.28)
+    function fmt(num) {
+        return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // MAIN BILLING CALCULATION ENGINE
+    function calculateBill() {
+        const weight = parseFloat(document.getElementById('weight').value) || 0;
+        const jartiPercent = parseFloat(document.getElementById('jartiPercent').value) || 0;
+        const silverGiven = parseFloat(document.getElementById('silverGiven').value) || 0;
+        const rate = parseFloat(document.getElementById('rate').value) || 0;
+        const jyalaTola = parseFloat(document.getElementById('jyalaTola').value) || 0;
+        const jyalaItem = parseFloat(document.getElementById('jyalaItem').value) || 0;
+        const discount = parseFloat(document.getElementById('discount').value) || 0;
+        const taxPercent = parseFloat(document.getElementById('taxPercent').value) || 0;
+        const advance = parseFloat(document.getElementById('advance').value) || 0;
+
+        // Calculations
+        const jartiAmountVal = weight * (jartiPercent / 100);
+        const totalWtWithJartiVal = weight + jartiAmountVal;
+        const finalTotalWtVal = totalWtWithJartiVal - silverGiven;
+
+        const rateTotalVal = finalTotalWtVal * rate;
+        const jyalaTolaTotalVal = finalTotalWtVal * jyalaTola;
+        const jyalaItemTotalVal = jyalaItem;
+
+        const totalAmountVal = rateTotalVal + jyalaTolaTotalVal + jyalaItemTotalVal;
+        const amtWithDiscountVal = totalAmountVal - discount;
+        const taxAmountVal = amtWithDiscountVal * (taxPercent / 100);
+        const grandTotalVal = amtWithDiscountVal + taxAmountVal;
+        const remainingAmountVal = grandTotalVal - advance;
+
+        // Render to UI
+        document.getElementById('jartiAmount').innerText = jartiAmountVal.toFixed(2);
+        document.getElementById('totalWtWithJarti').innerText = totalWtWithJartiVal.toFixed(2);
+        document.getElementById('finalTotalWt').innerText = finalTotalWtVal.toFixed(2);
+
+        document.getElementById('rateTotal').innerText = fmt(rateTotalVal);
+        document.getElementById('jyalaTolaTotal').innerText = fmt(jyalaTolaTotalVal);
+        document.getElementById('jyalaItemTotal').innerText = fmt(jyalaItemTotalVal);
+
+        document.getElementById('totalAmount').innerText = fmt(totalAmountVal);
+        document.getElementById('amtWithDiscount').innerText = fmt(amtWithDiscountVal);
+        document.getElementById('taxAmount').innerText = fmt(taxAmountVal);
+        document.getElementById('grandTotal').innerText = fmt(grandTotalVal);
+        document.getElementById('remainingAmount').innerText = fmt(remainingAmountVal);
+    }
+
+    // English AD to Nepali BS Date Converter
     function getTodayNepaliDate() {
         const now = new Date();
         const adYear = now.getFullYear();
         const adMonth = now.getMonth() + 1;
         const adDay = now.getDate();
 
-        // Approximate BS conversion logic (AD + 56 Years 8 Months 15 Days)
         let bsYear = adYear + 56;
         let bsMonth = adMonth + 8;
         let bsDay = adDay + 15;
 
-        if (bsDay > 30) {
-            bsDay -= 30;
-            bsMonth += 1;
-        }
-
-        if (bsMonth > 12) {
-            bsMonth -= 12;
-            bsYear += 1;
-        }
+        if (bsDay > 30) { bsDay -= 30; bsMonth += 1; }
+        if (bsMonth > 12) { bsMonth -= 12; bsYear += 1; }
 
         const formattedMonth = bsMonth < 10 ? `0${bsMonth}` : bsMonth;
         const formattedDay = bsDay < 10 ? `0${bsDay}` : bsDay;
@@ -322,7 +361,6 @@
         return `${bsYear}-${formattedMonth}-${formattedDay}`;
     }
 
-    // Set default Nepali date in header field
     document.getElementById('billDateBs').value = getTodayNepaliDate();
 
     // Live Fetch CSV Data directly from Google Sheet
@@ -340,15 +378,12 @@
                 if (!lines[i].trim()) continue;
                 
                 const cols = lines[i].split(',').map(col => col.replace(/^"|"$/g, '').trim());
-                
-                const name = cols[1];      // Column B: NAMES
-                const mobile = cols[2];    // Column C: MOBILE NO.
-                const landline = cols[3];  // Column D: LANDLINE
+                const name = cols[1];
+                const mobile = cols[2];
+                const landline = cols[3];
 
                 if (name) {
-                    const phone = mobile || landline || '';
-                    contactsDatabase[name] = phone;
-
+                    contactsDatabase[name] = mobile || landline || '';
                     const option = document.createElement('option');
                     option.value = name;
                     datalist.appendChild(option);
@@ -359,19 +394,16 @@
         }
     }
 
-    // Auto-update phone number when customer selected
     function updatePhoneNumber() {
         const nameInput = document.getElementById('customerName').value.trim();
         const phoneInput = document.getElementById('phoneNumber');
-
-        if (contactsDatabase[nameInput]) {
-            phoneInput.value = contactsDatabase[nameInput];
-        } else {
-            phoneInput.value = '';
-        }
+        phoneInput.value = contactsDatabase[nameInput] || '';
     }
 
-    window.onload = fetchLiveContacts;
+    window.onload = function() {
+        fetchLiveContacts();
+        calculateBill(); // Initialize calculations on page load
+    };
 </script>
 
 </body>
