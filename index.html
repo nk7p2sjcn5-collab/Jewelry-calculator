@@ -89,6 +89,18 @@
             margin: 8px 0;
         }
 
+        .row-words {
+            background-color: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 8px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+        }
+
         .label {
             font-weight: 600;
             color: #333333;
@@ -127,6 +139,13 @@
             text-align: right;
             min-width: 90px;
             font-size: 14px;
+        }
+
+        .amount-words-text {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 13.5px;
+            line-height: 1.4;
         }
 
         .text-green { color: #2e7d32; }
@@ -280,6 +299,12 @@
         <span class="amount text-red" id="remainingAmount">354,419.28</span>
     </div>
 
+    <!-- 6. AMOUNT IN WORDS -->
+    <div class="row-words">
+        <span class="label">AMOUNT IN WORDS <span class="sub-label">(अक्षरेपी)</span></span>
+        <span class="amount-words-text" id="amountInWordsNepali">तीन लाख चौवन्न हजार चार सय उन्नाइस रुपैयाँ अट्ठाइस पैसा मात्र</span>
+    </div>
+
     <!-- ACTION BUTTON -->
     <div class="action-area">
         <button type="button" class="btn-print" onclick="window.print()">Print / Save PDF</button>
@@ -301,6 +326,42 @@
     // Helper function for currency formatting (e.g. 354,419.28)
     function fmt(num) {
         return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // Convert Numbers to Nepali Words
+    function numberToNepaliWords(num) {
+        if (num === 0) return 'शून्य रुपैयाँ मात्र';
+
+        const ones = ['', 'एक', 'दुई', 'तीन', 'चार', 'पाँच', 'छ', 'सात', 'आठ', 'नौ', 'दस', 
+                      'एघार', 'बाह्र', 'तेह्र', 'चौध', 'पन्ध्र', 'सोह्र', 'सत्र', 'अठार', 'उन्नाइस', 'बीस', 
+                      'एकइस', 'बाइस', 'ताइस', 'चौबीस', 'पच्चिस', 'छब्बीस', 'सत्ताइस', 'अठ्ठाइस', 'उन्नतीस', 'तीस', 
+                      'एकतीस', 'बत्तीस', 'तेत्तीस', 'चौँतीस', 'पैँतीस', 'छत्तीस', 'सरतीस', 'अड्तीस', 'उनन्चालीस', 'चालीस', 
+                      'एकचालीस', 'बयालीस', 'त्रिचालीस', 'चौवालिस', 'पैँतालीस', 'छियालीस', 'सरचालीस', 'अढ्चालीस', 'उनन्चास', 'पचास', 
+                      'एककाउन्न', 'बाउन्न', 'त्रिपन्न', 'चौवन्न', 'पचपन्न', 'छप्पन्न', 'सन्ताउन्न', 'अन्ठाउन्न', 'उनन्सठ्ठी', 'साठी', 
+                      'एकसठ्ठी', 'बायसठ्ठी', 'त्रिसठ्ठी', 'चौंसठ्ठी', 'पैंसठ्ठी', 'छ्यासठ्ठी', 'सड्सठ्ठी', 'अड्सठ्ठी', 'उनन्सत्तरी', 'सत्तरी', 
+                      'एकहत्तर', 'बहत्तर', 'त्रिहत्तर', 'चौहत्तर', 'पचहत्तर', 'छ्याहत्तर', 'सतहत्तर', 'अठहत्तर', 'उनासी', 'असी', 
+                      'एकासी', 'बयासी', 'त्रिरासी', 'चौरासी', 'पचासी', 'छियासी', 'सतासी', 'अठासी', 'उनान्नब्बे', 'नब्बे', 
+                      'एकान्नब्बे', 'बयान्नब्बे', 'त्रियान्नब्बे', 'चौरान्नब्बे', 'पञ्चान्नब्बे', 'छ्यान्नब्बे', 'सन्तान्नब्बे', 'अन्ठान्नब्बे', 'उनान्सेय'];
+
+        let rupees = Math.floor(num);
+        let paisa = Math.round((num - rupees) * 100);
+
+        function convertGroup(n) {
+            let str = '';
+            if (n >= 10000000) { str += convertGroup(Math.floor(n / 10000000)) + ' करोड '; n %= 10000000; }
+            if (n >= 100000) { str += convertGroup(Math.floor(n / 100000)) + ' लाख '; n %= 100000; }
+            if (n >= 1000) { str += convertGroup(Math.floor(n / 1000)) + ' हजार '; n %= 1000; }
+            if (n >= 100) { str += ones[Math.floor(n / 100)] + ' सय '; n %= 100; }
+            if (n > 0) { str += ones[n] + ' '; }
+            return str.trim();
+        }
+
+        let words = convertGroup(rupees) ? convertGroup(rupees) + ' रुपैयाँ' : '';
+        if (paisa > 0) {
+            words += (words ? ' ' : '') + ones[paisa] + ' पैसा';
+        }
+
+        return (words + ' मात्र').trim();
     }
 
     // MAIN BILLING CALCULATION ENGINE
@@ -344,6 +405,9 @@
         document.getElementById('taxAmount').innerText = fmt(taxAmountVal);
         document.getElementById('grandTotal').innerText = fmt(grandTotalVal);
         document.getElementById('remainingAmount').innerText = fmt(remainingAmountVal);
+
+        // Update Amount in Words automatically based on Remaining Amount
+        document.getElementById('amountInWordsNepali').innerText = numberToNepaliWords(remainingAmountVal);
     }
 
     // English AD to Nepali BS Date Converter
