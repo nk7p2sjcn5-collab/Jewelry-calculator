@@ -382,7 +382,7 @@
         let finalTotalWtVal = roundDown2(totalWtWithJartiVal - silverGiven);
 
         let rateTotalVal = roundDown2(finalTotalWtVal * rate);
-        let jyalaTolaTotalVal = roundDown2(finalTotalWtVal * jyalaTola);
+        let jyalaTolaTotalVal = roundDown2(weight * jyalaTola); // Corrected: weight * jyalaTola
         let jyalaItemTotalVal = roundDown2(jyalaItem);
 
         let totalAmountVal = roundDown2(rateTotalVal + jyalaTolaTotalVal + jyalaItemTotalVal);
